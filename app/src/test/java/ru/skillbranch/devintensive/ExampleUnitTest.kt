@@ -7,8 +7,7 @@ import ru.skillbranch.devintensive.extensions.TimeUnits
 import ru.skillbranch.devintensive.extensions.add
 import ru.skillbranch.devintensive.extensions.format
 import ru.skillbranch.devintensive.extensions.toUserView
-import ru.skillbranch.devintensive.models.User
-import ru.skillbranch.devintensive.utils.Utils
+import ru.skillbranch.devintensive.models.*
 import java.util.*
 
 /**
@@ -24,51 +23,50 @@ class ExampleUnitTest {
 
     @Test
     fun test_instance() {
-        println(Utils.parseFullName("John"))
+        val user = User("1")
+        val user2 = User("2", "John", "Wick")
+        val user3 = User("3", "John", "Silverhand", null,  lastVisit = Date(), isOnline = true)
+
+        println("$user $user2 $user3")
     }
 
     @Test
     fun test_factory() {
-        val user = User.makeUser("John Cena")
-        val user2 = user.copy(id = "2", lastName = "Wick", lastVisit = Date())
-        print("$user \n$user2")
-        //val user2 = User.makeUser("John Wick")
-        //val user3 = User.makeUser("John Silverhand")
-    }
-
-    @Test
-    fun test_decomposition() {
-        val user = User.makeUser("John Wick")
-
-        fun getUserInfo() = user
-
-        val (id, firstName, lastName) = getUserInfo()
-
-        println("$id, $firstName, $lastName")
-        println("${user.component1()}, ${user.component2()}, ${user.component3()}")
+        var user = User.makeUser("John Cena")
+        var user2 = User.makeUser("John John")
+        var user3 = User.makeUser("John Wick")
+        print(user3)
     }
 
     @Test
     fun test_copy() {
         val user = User.makeUser("John Wick")
-        var user2 = user.copy(lastVisit = Date().add(-2, TimeUnits.SECOND))
-        var user3 = user.copy(lastName = "Cena", lastVisit = Date().add(2, TimeUnits.HOUR))
-        var user4 = user.copy(lastName = "Cena", lastVisit = Date())
+        val user2 = user.copy(lastVisit = Date().add(-2, TimeUnits.SECOND))
+        val user3 = user.copy(lastName = "Cena", lastVisit = Date().add(2, TimeUnits.HOUR))
 
         println("""
             ${user.lastVisit?.format()}
             ${user2.lastVisit?.format()}
             ${user3.lastVisit?.format()}
-            ${user4.lastVisit?.format()}
         """.trimIndent())
     }
 
     @Test
-    fun test_data_mapping() {
-        val user = User.makeUser("Данилейченко Женя")
-        val newUser = user.copy(lastVisit = Date().add(-7, TimeUnits.SECOND))
-        println(newUser)
+    fun data_mapping() {
+        val user = User.makeUser("Женя Данилей")
+        val newUser = user.copy(lastVisit = Date().add(-7, TimeUnits.HOUR))
+        //println(user)
         val userView = newUser.toUserView()
         userView.printMe()
+    }
+
+    @Test
+    fun test_abstract_factory() {
+        val user = User.makeUser("Женя Данилей")
+        val txtMessage = BaseMessage.makeMessage(user, Chat("0"), payload = "any text message", type = "text")
+        val imgMessage = BaseMessage.makeMessage(user, Chat("0"), payload = "any image url", type = "image")
+
+        println(txtMessage.formatMessage())
+        println(imgMessage.formatMessage())
     }
 }
